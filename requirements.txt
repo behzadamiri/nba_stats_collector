@@ -1,0 +1,10 @@
+python-decouple
+black
+sqlalchemy
+nba_api
+pandas
+apache-airflow
+psycopg2-binary
+pytest
+dash
+dash-bootstrap-components
