@@ -7,6 +7,18 @@ engine = create_engine(DATABASE_URL)
 
 
 # Load data from the database into a pandas DataFrame
+def load_team_id_map():
+    with engine.connect() as connection:
+        query = """
+        select id as team_id,
+            full_name as team_name
+        from teams
+        """
+        data = pd.read_sql(query, connection)
+    return data
+
+
+# Load data from the database into a pandas DataFrame
 def load_player_id_map():
     with engine.connect() as connection:
         query = """
@@ -18,7 +30,7 @@ def load_player_id_map():
 
 
 # Load data from the database into a pandas DataFrame
-def load_team_stats_per_game():
+def load_team_stats_per_game(team_id):
     with engine.connect() as connection:
         query = """
         with all_teams_in_games as
@@ -74,7 +86,10 @@ def load_team_stats_per_game():
         join public.game_line_scores gls
         on gls.game_id = all_teams_in_games.game_id and
         gls.team_id = all_teams_in_games.team_id
-        """
+        where all_teams_in_games.team_id = {}
+        """.format(
+            team_id
+        )
         data = pd.read_sql(query, connection)
     return data
 
