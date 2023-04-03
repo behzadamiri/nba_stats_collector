@@ -203,3 +203,35 @@ def draw_court(fig):
         fig.add_shape(shape)
 
     return fig
+
+
+def create_shot_chart(data):
+    made_shots = data[data["SHOT_MADE_FLAG"] == "Made"]
+    missed_shots = data[data["SHOT_MADE_FLAG"] == "Missed"]
+
+    fig = go.Figure()
+
+    fig.add_trace(
+        go.Scatter(
+            x=made_shots["LOC_X"] * 0.94,
+            y=made_shots["LOC_Y"] / 2,
+            mode="markers",
+            marker=dict(color="green", size=5),
+            name="Made",
+        )
+    )
+
+    fig.add_trace(
+        go.Scatter(
+            x=missed_shots["LOC_X"] * 0.94,
+            y=missed_shots["LOC_Y"] / 2,
+            mode="markers",
+            marker=dict(color="red", size=5),
+            name="Missed",
+        )
+    )
+
+    # Draw court
+    fig = draw_court(fig)
+
+    return fig

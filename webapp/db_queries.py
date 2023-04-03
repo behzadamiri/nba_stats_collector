@@ -5,6 +5,18 @@ from nba_stats_collector.config import DATABASE_URL
 # Connect to your nba_stats database
 engine = create_engine(DATABASE_URL)
 
+
+# Load data from the database into a pandas DataFrame
+def load_player_id_map():
+    with engine.connect() as connection:
+        query = """
+        select distinct player_id, player_name
+        from public.player_stats_by_game
+        """
+        data = pd.read_sql(query, connection)
+    return data
+
+
 # Load data from the database into a pandas DataFrame
 def load_team_stats_per_game():
     with engine.connect() as connection:
@@ -67,20 +79,36 @@ def load_team_stats_per_game():
     return data
 
 
-def load_shotchart_data():
+def load_shotchart_data(player_id):
     with engine.connect() as connection:
         query = """
-        select "playerNameI" as "PLAYER_NAME",
+        with get_all_shots as
+        (
+        select "personId" as player_id,
                 "x" as "LOC_X", 
                 "y" as "LOC_Y", 
                 "shotResult"  as "SHOT_MADE_FLAG"
         from public.two_point
         union 
-        select "playerNameI" as "PLAYER_NAME",
+        select "personId" as player_id,
                 "x" as "LOC_X", 
                 "y" as "LOC_Y", 
                 "shotResult"  as "SHOT_MADE_FLAG"
-        from public.threepoint 
-        """
+        from public.threepoint
+        )
+        , player_id_map as
+        (
+        select distinct player_id, player_name
+        from public.player_stats_by_game
+        )
+        select get_all_shots.*,
+            player_id_map.player_name
+        from get_all_shots
+        join player_id_map
+        on player_id_map.player_id = get_all_shots.player_id
+        where get_all_shots.player_id = {}
+        """.format(
+            player_id
+        )
         data = pd.read_sql(query, connection)
     return data
