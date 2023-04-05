@@ -96,18 +96,12 @@ class NBAStatsETL:
 
             except Exception as e:
                 logger.error(
-                    "Failed to commit data to {} table. Data: {}. Error: {}".format(
-                        table_model.__tablename__,
-                        data,
-                        e,
-                    )
+                    f"Failed to commit data to {table_model.__tablename__} table. Data: {data}. Error: {e}"
                 )
                 continue
 
         logger.info(
-            "Successfully commited {} data points to {} table.".format(
-                counter, table_model.__tablename__
-            )
+            f"Successfully commited {counter} data points to {table_model.__tablename__} table."
         )
 
     def store_team_data(self):

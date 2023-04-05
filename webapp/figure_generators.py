@@ -1,4 +1,6 @@
 import plotly.graph_objs as go
+from webapp.db_queries import load_shotchart_data, load_team_stats_per_game
+import plotly.express as px
 
 
 def draw_court(fig):
@@ -234,4 +236,21 @@ def create_shot_chart(data):
     # Draw court
     fig = draw_court(fig)
 
+    return fig
+
+
+def create_shot_chart_figure(player_id):
+    filtered_data = load_shotchart_data(player_id)
+    shot_chart = create_shot_chart(filtered_data)
+    return shot_chart
+
+
+def create_fg_pct_figure(team_id):
+    filtered_data = load_team_stats_per_game(team_id)
+    fig = px.line(
+        filtered_data,
+        x="game_number",
+        y="fg_pct",
+        title="Field Goal Percentage by Game",
+    )
     return fig

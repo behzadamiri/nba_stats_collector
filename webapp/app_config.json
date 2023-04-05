@@ -1,0 +1,20 @@
+[
+    {
+        "tab_name": "Shot Chart",
+        "dropdowns": [
+            "player"
+        ],
+        "graphs": [
+            "shot_chart"
+        ]
+    },
+    {
+        "tab_name": "Team FG % per Game",
+        "dropdowns": [
+            "team"
+        ],
+        "graphs": [
+            "team_fg_pct"
+        ]
+    }
+]

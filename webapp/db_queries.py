@@ -10,8 +10,8 @@ engine = create_engine(DATABASE_URL)
 def load_team_id_map():
     with engine.connect() as connection:
         query = """
-        select id as team_id,
-            full_name as team_name
+        select id as id,
+            full_name as name
         from teams
         """
         data = pd.read_sql(query, connection)
@@ -22,7 +22,8 @@ def load_team_id_map():
 def load_player_id_map():
     with engine.connect() as connection:
         query = """
-        select distinct player_id, player_name
+        select distinct player_id as id,
+            player_name as name
         from public.player_stats_by_game
         """
         data = pd.read_sql(query, connection)
@@ -32,7 +33,7 @@ def load_player_id_map():
 # Load data from the database into a pandas DataFrame
 def load_team_stats_per_game(team_id):
     with engine.connect() as connection:
-        query = """
+        query = f"""
         with all_teams_in_games as
         (
             select game_date_est,
@@ -86,17 +87,15 @@ def load_team_stats_per_game(team_id):
         join public.game_line_scores gls
         on gls.game_id = all_teams_in_games.game_id and
         gls.team_id = all_teams_in_games.team_id
-        where all_teams_in_games.team_id = {}
-        """.format(
-            team_id
-        )
+        where all_teams_in_games.team_id = {team_id}
+        """
         data = pd.read_sql(query, connection)
     return data
 
 
 def load_shotchart_data(player_id):
     with engine.connect() as connection:
-        query = """
+        query = f"""
         with get_all_shots as
         (
         select "personId" as player_id,
@@ -121,9 +120,7 @@ def load_shotchart_data(player_id):
         from get_all_shots
         join player_id_map
         on player_id_map.player_id = get_all_shots.player_id
-        where get_all_shots.player_id = {}
-        """.format(
-            player_id
-        )
+        where get_all_shots.player_id = {player_id}
+        """
         data = pd.read_sql(query, connection)
     return data

@@ -1,40 +1,23 @@
+import json
 import dash
 from dash import html, dcc
 import dash_bootstrap_components as dbc
 from webapp.callbacks import AppCallbacks
-from webapp.db_queries import load_player_id_map, load_team_id_map
 from webapp.layouts import AppLayouts
 
-player_id_map = load_player_id_map()
-team_id_map = load_team_id_map()
+
+config_path = "webapp/app_config.json"
 
 # Create a Dash app
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
 
 # Instantiate AppLayouts
-app_layouts = AppLayouts(player_id_map, team_id_map)
+app_layouts = AppLayouts(config_path)
 
 # Define the app layout
-app.layout = html.Div(
-    [
-        # Add a tabs component to display multiple graphs
-        dcc.Tabs(
-            [
-                dcc.Tab(
-                    label="Shot Chart",
-                    children=app_layouts.create_shot_chart_tab(),
-                ),
-                dcc.Tab(
-                    label="Team FG % per Game",
-                    children=app_layouts.create_team_fg_pct_tab(),
-                ),
-                # Add more tabs with different graphs as needed
-            ]
-        ),
-    ]
-)
+app.layout = html.Div([app_layouts.create_tabs()])
 
-app_callbacks = AppCallbacks(app)
+app_callbacks = AppCallbacks(app, app_layouts.config)
 
 # Run the app
 if __name__ == "__main__":

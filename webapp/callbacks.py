@@ -1,43 +1,47 @@
 from dash.dependencies import Input, Output
 
-# Import other necessary modules and functions
-from webapp.db_queries import load_shotchart_data, load_team_stats_per_game
-from webapp.components import create_shot_chart
-
-import plotly.express as px
+from webapp.figure_generators import create_shot_chart_figure, create_fg_pct_figure
 
 
 class AppCallbacks:
-    def __init__(self, app):
+    def __init__(self, app, config):
         self.app = app
+        self.config = config
         self.register_callbacks()
 
-    def register_callbacks(self):
-        self.shot_chart_callback()
-        self.fg_pct_callback()
-        # ... other callback registrations
+    @staticmethod
+    def _generate_inputs(tab_id, dropdowns):
+        return [
+            Input(f"{tab_id}_{dropdown}-dropdown", "value") for dropdown in dropdowns
+        ]
 
-    def shot_chart_callback(self):
+    def register_callbacks(self):
+        for tab_config in self.config:
+            tab_id = tab_config["tab_name"].lower().replace(" ", "_")
+            for graph_name in tab_config["graphs"]:
+                graph_id = f"{tab_id}_{graph_name}"
+                match graph_name:
+                    case "shot_chart":
+                        self.shot_chart_callback(
+                            tab_id, graph_id, tab_config["dropdowns"]
+                        )
+                    case "team_fg_pct":
+                        self.fg_pct_callback(tab_id, graph_id, tab_config["dropdowns"])
+
+    def shot_chart_callback(self, tab_id, graph_id, dropdowns):
         @self.app.callback(
-            Output("shot-chart", "figure"), [Input("player-dropdown", "value")]
+            Output(graph_id, "figure"),
+            self._generate_inputs(tab_id, dropdowns),
         )
         def _update_shot_chart(player_id):
-            filtered_data = load_shotchart_data(player_id)
-            shot_chart = create_shot_chart(filtered_data)
-            return shot_chart
+            return create_shot_chart_figure(player_id)
 
-    def fg_pct_callback(self):
+    def fg_pct_callback(self, tab_id, graph_id, dropdowns):
         @self.app.callback(
-            Output("fg_pct_plot", "figure"), [Input("team-dropdown", "value")]
+            Output(graph_id, "figure"),
+            self._generate_inputs(tab_id, dropdowns),
         )
-        def update_fg_pct_plot(team_id):
-            filtered_data = load_team_stats_per_game(team_id)
-            fig = px.line(
-                filtered_data,
-                x="game_number",
-                y="fg_pct",
-                title="Field Goal Percentage by Game",
-            )
-            return fig
+        def _update_fg_pct_plot(team_id):
+            return create_fg_pct_figure(team_id)
 
     # ... other callbacks
