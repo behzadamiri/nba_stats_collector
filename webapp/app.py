@@ -1,6 +1,5 @@
-import json
 import dash
-from dash import html, dcc
+from dash import html
 import dash_bootstrap_components as dbc
 from webapp.callbacks import AppCallbacks
 from webapp.layouts import AppLayouts

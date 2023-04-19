@@ -31,9 +31,10 @@ def load_player_id_map():
 
 
 # Load data from the database into a pandas DataFrame
-def load_team_stats_per_game(team_id):
+def load_team_stats_per_game(team_id=None):
     with engine.connect() as connection:
-        query = f"""
+        query = (
+            f"""
         with all_teams_in_games as
         (
             select game_date_est,
@@ -87,8 +88,12 @@ def load_team_stats_per_game(team_id):
         join public.game_line_scores gls
         on gls.game_id = all_teams_in_games.game_id and
         gls.team_id = all_teams_in_games.team_id
-        where all_teams_in_games.team_id = {team_id}
+        
         """
+            + f"where all_teams_in_games.team_id = {team_id}"
+            if team_id
+            else ""
+        )
         data = pd.read_sql(query, connection)
     return data
 

@@ -1,20 +1,34 @@
 [
     {
-        "tab_name": "Shot Chart",
+        "tab_name": "Team Stats",
+        "subtabs": [
+            {
+                "tab_name": "FG %",
+                "dropdowns": [
+                    "team"
+                ],
+                "graphs": [
+                    "team_fg_pct"
+                ]
+            },
+            {
+                "tab_name": "FT %",
+                "dropdowns": [
+                    "team"
+                ],
+                "graphs": [
+                    "team_ft_pct"
+                ]
+            }
+        ]
+    },
+    {
+        "tab_name": "Player Stats",
         "dropdowns": [
             "player"
         ],
         "graphs": [
             "shot_chart"
-        ]
-    },
-    {
-        "tab_name": "Team FG % per Game",
-        "dropdowns": [
-            "team"
-        ],
-        "graphs": [
-            "team_fg_pct"
         ]
     }
 ]

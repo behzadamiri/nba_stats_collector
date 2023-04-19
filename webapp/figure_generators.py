@@ -245,12 +245,12 @@ def create_shot_chart_figure(player_id):
     return shot_chart
 
 
-def create_fg_pct_figure(team_id):
+def create_team_stat_figure(team_id, stat, title=None):
     filtered_data = load_team_stats_per_game(team_id)
     fig = px.line(
         filtered_data,
         x="game_number",
-        y="fg_pct",
-        title="Field Goal Percentage by Game",
+        y=stat,
+        title=title if title else stat,
     )
     return fig
